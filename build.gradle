@@ -12,8 +12,8 @@ def ossrhUser = hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('os
 def ossrhPass = hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('ossrhPassword')
 
 compileJava.options.encoding = 'UTF-8'
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 8
+targetCompatibility = 8
 
 group = 'com.github.zakgof'
 archivesBaseName = 'actr'
