@@ -123,7 +123,7 @@ class ActorImpl<T> implements IActorRef<T> {
 
     @Override
     public String toString() {
-        return "[" + actorSystem.name() + ":" + name + "]";
+        return "[" + name + "]";
     }
 
     @Override

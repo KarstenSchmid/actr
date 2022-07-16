@@ -1,25 +1,20 @@
 package com.zakgof.actr.impl;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.zakgof.actr.IActorBuilder;
 import com.zakgof.actr.IActorRef;
 import com.zakgof.actr.IActorScheduler;
 import com.zakgof.actr.IActorSystem;
-import com.zakgof.actr.IForkBuilder;
 import com.zakgof.actr.Schedulers;
 
 public class ActorSystemImpl implements IActorSystem {
@@ -277,62 +272,7 @@ public class ActorSystemImpl implements IActorSystem {
         return "ActorSystem " + name;
     }
 
-    @Override
-    public <I, T> IForkBuilder<I, T> forkBuilder(Collection<I> ids) {
-        return new ForkBuilderImpl<I, T>().ids(ids);
-    }
-
     public interface TernaryConsumer<A, B, C> {
         void accept(A a, B b, C c);
     }
-
-    private class ForkBuilderImpl<I, T> implements IForkBuilder<I, T> {
-
-        private Collection<I> ids;
-        private Function<I, T> constructor;
-        private Function<I, IActorScheduler> scheduler = i -> ActorSystemImpl.this.defaultScheduler;
-
-        @Override
-        public IForkBuilder<I, T> ids(Collection<I> ids) {
-            this.ids = ids;
-            return this;
-        }
-
-        @Override
-        public IForkBuilder<I, T> constructor(Function<I, T> constructor) {
-            this.constructor = constructor;
-            return this;
-        }
-
-        @Override
-        public IForkBuilder<I, T> scheduler(Function<I, IActorScheduler> scheduler) {
-            this.scheduler = scheduler;
-            return this;
-        }
-
-        @Override
-        public <R> void ask(BiFunction<I, T, R> action, Consumer<Map<I, R>> result) {
-            ask((id, pojo, resultConsumer) -> resultConsumer.accept(action.apply(id, pojo)), result);
-        }
-
-        @Override
-        public <R> void ask(TernaryConsumer<I, T, Consumer<R>> action, Consumer<Map<I, R>> result) {
-
-            Map<I, R> map = new ConcurrentHashMap<>();
-            for (I id : ids) {
-                IActorRef<T> actor = ActorSystemImpl.this.<T>actorBuilder()
-                    .constructor(() -> constructor.apply(id))
-                    .scheduler(scheduler.apply(id))
-                    .build();
-                Consumer<R> callback = r -> {
-                    map.put(id, r);
-                    if (map.size() == ids.size()) {
-                        result.accept(map);
-                    }
-                };
-                actor.ask((target, c) -> action.accept(id, target, c), callback);
-            }
-        }
-    }
-
 }

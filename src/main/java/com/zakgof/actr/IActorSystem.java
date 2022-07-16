@@ -1,6 +1,5 @@
 package com.zakgof.actr;
 
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -51,7 +50,5 @@ public interface IActorSystem {
      */
     <T> IActorRef<T> actorOf(Supplier<T> constructor);
 
-    <I, T> IForkBuilder<I, T> forkBuilder(Collection<I> ids);
-
-    String name();
+     String name();
 }

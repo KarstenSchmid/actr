@@ -3,7 +3,6 @@ package com.zakgof.actr;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ThreadFactory;
 
 import com.zakgof.actr.impl.BlockingThreadScheduler;
 import com.zakgof.actr.impl.ExecutorBasedScheduler;

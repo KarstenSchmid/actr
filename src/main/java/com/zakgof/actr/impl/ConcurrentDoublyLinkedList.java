@@ -36,12 +36,7 @@ import java.util.function.IntFunction;
  * @param <E> the type of elements held in this collection
  */
 
-class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E>
-        implements java.io.Serializable {
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
-    }
+class ConcurrentDoublyLinkedList<E> extends AbstractCollection<E> implements java.io.Serializable {
 
     /*
      * This is an adaptation of an algorithm described in Paul Martin's "A Practical Lock-Free Doubly-Linked List". Sun Labs Tech report. The basic idea is to primarily rely on next-pointers to ensure consistency. Prev-pointers are in part
