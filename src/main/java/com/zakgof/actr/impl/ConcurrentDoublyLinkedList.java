@@ -14,7 +14,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.IntFunction;
 
 /**
  * A concurrent linked-list implementation of a {@link Deque} (double-ended queue). Concurrent insertion, removal, and access operations execute safely across multiple threads. Iterators are <i>weakly consistent</i>, returning elements reflecting the
