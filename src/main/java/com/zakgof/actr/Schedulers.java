@@ -67,8 +67,8 @@ public class Schedulers {
      * Creates a scheduler that creates a single-thread executor for each actor.
      * @return scheduler
      */
-    public static IActorScheduler newThreadPerActorScheduler() {
-        return new ThreadPerActorScheduler();
+    public static IActorScheduler newThreadPerActorScheduler(ILogger logger) {
+        return new ThreadPerActorScheduler(logger);
     }
 
 }

@@ -1,22 +1,41 @@
 package com.zakgof.actr.impl;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.zakgof.actr.IActorScheduler;
+import com.zakgof.actr.ILogger;
 
 /**
  * Scheduler that creates a single-thread executor for each actor.
  */
 public class ThreadPerActorScheduler implements IActorScheduler {
 
-    private final Map<Object, ExecutorService> executors = new ConcurrentHashMap<>();
+    private final Map<Object, ThreadPoolExecutor> executors = new ConcurrentHashMap<>();
+	private final Timer timer;
 
-    @Override
+    public ThreadPerActorScheduler(ILogger logger) {
+		timer = new Timer("SchedulerStats", true);
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				for (Entry<Object, ThreadPoolExecutor> entry : executors.entrySet())
+					logger.log("Actor " + entry.getKey() + " - current: " + entry.getValue().getQueue().size() + ", total: " + entry.getValue().getCompletedTaskCount());
+			}
+		}, 10000, 10000);
+	}
+
+	@Override
     public void actorCreated(Object actorId) {
-        executors.put(actorId, Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "actr:" + actorId)));
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), runnable -> new Thread(runnable, "actr:" + actorId));
+        executors.put(actorId, executor);
     }
 
     @Override
@@ -35,6 +54,7 @@ public class ThreadPerActorScheduler implements IActorScheduler {
 
     @Override
     public void close() {
+    	timer.cancel();
         executors.values().forEach(ExecutorService::shutdown);
     }
 }
