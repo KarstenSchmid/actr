@@ -47,7 +47,7 @@ public class ThreadPerActorScheduler implements IActorScheduler {
     @Override
     public void schedule(Runnable task, Object actorId) {
         ExecutorService executor = executors.get(actorId);
-        if (!executor.isShutdown()) {
+        if (executor != null && !executor.isShutdown()) {
             executor.execute(task);
         }
     }
