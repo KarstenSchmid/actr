@@ -56,11 +56,9 @@ public class Actr {
     /**
      * Gets the reference to the actor calling this actor.
      *
-     * When called from a properly called actor tell/ask/later action, return the actor from which context this actor's action was called.
+     * When called from a properly called actor tell/later action, return the actor from which context this actor's action was called.
      *
-     * If called in a callback for {@link IActorRef#ask} calls, this method returns a reference to the 'asked' actor.
-     *
-     * For ask/later calls not from actor context, this method returns null
+     * For later calls not from actor context, this method returns null
      *
      * @param <T> actor POJO class
      * @return {@link IActorRef} for the caller actor, or null if called not from actor context or from an actor called from outside any actor context

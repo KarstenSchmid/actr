@@ -233,7 +233,7 @@ public class ActorSystemImpl implements IActorSystem {
         /**
          * Sets an exception handler for the actor being constructed.
          *
-         * Exception handler is triggered in actor's thread context whenever an exception occurs in actor's <i>ask</i>, <i>tell</i> or <i>later</i> call. Note that the exception handler is ignored when calling methods returning CallableFuture as in that case the exception is passed directly to the future.
+         * Exception handler is triggered in actor's thread context whenever an exception occurs in actor's <i>tell</i> or <i>later</i> call. Note that the exception handler is ignored when calling methods returning CallableFuture as in that case the exception is passed directly to the future.
          *
          * @param exceptionHandler exception handler to be triggered
          * @return this builder

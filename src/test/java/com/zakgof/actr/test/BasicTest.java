@@ -47,113 +47,13 @@ class BasicTest {
     }
 
     @Test
-    void ask() {
-        assertNull(Actr.caller());
-        assertNull(Actr.current());
-        master.tell(Master::ask47);
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallReturning, ResultReturned, ActorDestructor);
-    }
-
-    @Test
-    void askFuture() {
-        assertNull(Actr.caller());
-        assertNull(Actr.current());
-        master.tell(Master::askFuture);
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallReturning, ResultReturned, FutureCompleted, ActorDestructor);
-    }
-
-    @Test
-    void askFromNonActor() {
-        testActor.ask(TestActor::returning, val -> {
-            assertEquals(47, val);
-            NonActorCallback.check();
-            assertNull(Actr.caller());
-            system.shutdown();
-        });
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallReturning, NonActorCallback, ActorDestructor);
-    }
-
-    @Test
-    void askFutureFromNonActor() {
-        CompletableFuture<Integer> future = testActor.ask(TestActor::returning);
-        future.thenAccept(val -> {
-            assertEquals(47, val);
-            NonActorCallback.check();
-            assertNull(Actr.caller());
-            system.shutdown();
-        }).join();
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallReturning, NonActorCallback, ActorDestructor);
-    }
-
-    @Test
     void tellError() {
         master.tell(Master::tellError);
         system.shutdownCompletable().join();
         validate(ActorConstructor, ActorCallThrowing, ExceptionHandler, ActorDestructor);
     }
 
-    @Test
-    void askError() {
-        master.tell(Master::askError);
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallThrowing, ExceptionHandler, ActorDestructor);
-    }
-
-    @Test
-    void askErrorFuture() {
-        master.tell(Master::askErrorFuture);
-        system.shutdownCompletable().join();
-        validate(ActorConstructor, ActorCallThrowing, FutureFailed, ActorDestructor);
-    }
-
     private class Master {
-
-        void ask47() {
-            assertNull(Actr.caller());
-            assertEquals(master, Actr.current());
-            testActor.ask(TestActor::returning, this::validateResult);
-            assertNull(Actr.caller());
-            assertEquals(master, Actr.current());
-        }
-
-        void askFuture() {
-            CompletableFuture<Integer> future = testActor.ask(TestActor::returning);
-            assertNull(Actr.caller());
-            assertEquals(master, Actr.current());
-
-            future.thenAccept(value -> {
-                validateResult(value);
-                FutureCompleted.check();
-            }).exceptionally(ex -> {
-                FutureFailed.check();
-                system.shutdown();
-                return null;
-            });
-        }
-
-        void askErrorFuture() {
-            CompletableFuture<Integer> future = testActor.ask(TestActor::throwing);
-            assertNull(Actr.caller());
-            assertEquals(master, Actr.current());
-
-            future.thenAccept(value -> fail()).exceptionally(ex -> {
-                assertEquals(master, Actr.current());
-                assertEquals(testActor, Actr.caller());
-                FutureFailed.check();
-                system.shutdown();
-                return null;
-            });
-        }
-
-        void askError() {
-            testActor.ask(TestActor::throwing, value -> fail());
-            assertNull(Actr.caller());
-            assertEquals(master, Actr.current());
-        }
 
         void tellError() {
             testActor.tell(TestActor::throwing);

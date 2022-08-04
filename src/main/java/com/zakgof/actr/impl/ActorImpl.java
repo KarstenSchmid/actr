@@ -1,10 +1,8 @@
 package com.zakgof.actr.impl;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.zakgof.actr.Actr;
@@ -71,50 +69,9 @@ class ActorImpl<T> implements IActorRef<T> {
     public void later(Consumer<T> action, long ms) {
         IActorRef<?> caller = Actr.current();
         actorSystem.later(() -> {
-            if (object != null) {
+            if (object != null)
                 scheduleCall(action, caller);
-            }
         }, ms);
-    }
-
-    @Override
-    public <R> void ask(BiConsumer<T, Consumer<R>> action, Consumer<R> consumer) {
-        IActorRef<?> current = Actr.current();
-        Consumer<R> completion = current == null
-                ? consumer
-                : result -> current.tell(c -> consumer.accept(result));
-        tell(target -> action.accept(target, completion));
-    }
-
-    @Override
-    public <R> void ask(Function<T, R> call, Consumer<R> consumer) {
-        ask((target, callback) -> callback.accept(call.apply(target)), consumer);
-    }
-
-    @Override
-    public <R> CompletableFuture<R> ask(BiConsumer<T, Consumer<R>> action) {
-        IActorRef<?> current = Actr.current();
-        CompletableFuture<R> future = new CompletableFuture<>();
-        Consumer<R> completion = current == null
-                ? future::complete
-                : result -> current.tell(c -> future.complete(result));
-        Consumer<Exception> failure = current == null
-                ? future::completeExceptionally
-                : exception -> current.tell(c -> future.completeExceptionally(exception));
-        scheduleCallErrorAware(target -> action.accept(target, completion), current, failure);
-        return future;
-    }
-
-    @Override
-    public <R> CompletableFuture<R> ask(Function<T, R> action) {
-        return ask((target, callback) -> callback.accept(action.apply(target)));
-    }
-
-    private static IActorRef<?> safeCurrent() {
-        IActorRef<?> caller = Actr.current();
-        if (caller == null)
-            throw new IllegalStateException("It is not allowed to call ask from non-actor context. There's no actor to receive the response");
-        return caller;
     }
 
     T object() {
@@ -148,13 +105,11 @@ class ActorImpl<T> implements IActorRef<T> {
             object = null;
             whenFinished.run();
         });
-
     }
 
     @Override
     public void close() {
-        dispose(() -> {
-        });
+        dispose(() -> {});
     }
 
     void box(Object box) {
@@ -172,5 +127,4 @@ class ActorImpl<T> implements IActorRef<T> {
     IRegistration reg() {
         return reg;
     }
-
 }
