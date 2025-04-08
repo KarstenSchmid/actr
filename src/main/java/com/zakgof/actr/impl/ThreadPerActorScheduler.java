@@ -26,8 +26,13 @@ public class ThreadPerActorScheduler implements IActorScheduler {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				for (Entry<Object, ThreadPoolExecutor> entry : executors.entrySet())
-					logger.log("Actor " + entry.getKey() + " - current: " + entry.getValue().getQueue().size() + ", total: " + entry.getValue().getCompletedTaskCount());
+				for (Entry<Object, ThreadPoolExecutor> entry : executors.entrySet()) {
+                    int queueSize = entry.getValue().getQueue().size();
+                    if (queueSize > 100)
+                        logger.warn("Actor " + entry.getKey() + " - current: " + queueSize + ", total: " + entry.getValue().getCompletedTaskCount());
+                    else if (queueSize > 0)
+                        logger.info("Actor " + entry.getKey() + " - current: " + entry.getValue().getQueue().size() + ", total: " + entry.getValue().getCompletedTaskCount());
+                }
 			}
 		}, 10000, 10000);
 	}
@@ -56,5 +61,12 @@ public class ThreadPerActorScheduler implements IActorScheduler {
     public void close() {
     	timer.cancel();
         executors.values().forEach(ExecutorService::shutdown);
+    }
+
+    public int getQueueSize(Object actorId) {
+        ThreadPoolExecutor executor = executors.get(actorId);
+        if (executor != null && executor.getQueue() != null)
+            return executor.getQueue().size();
+        return 0;
     }
 }

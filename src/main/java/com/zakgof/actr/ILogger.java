@@ -1,5 +1,6 @@
 package com.zakgof.actr;
 
 public interface ILogger {
-	void log(String message);
+	void info(String message);
+	void warn(String message);
 }
