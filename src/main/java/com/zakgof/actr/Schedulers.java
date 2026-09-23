@@ -1,8 +1,10 @@
 package com.zakgof.actr;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 
 import com.zakgof.actr.impl.BlockingThreadScheduler;
 import com.zakgof.actr.impl.ExecutorBasedScheduler;
@@ -67,8 +69,8 @@ public class Schedulers {
      * Creates a scheduler that creates a single-thread executor for each actor.
      * @return scheduler
      */
-    public static IActorScheduler newThreadPerActorScheduler(ILogger logger) {
-        return new ThreadPerActorScheduler(logger);
+    public static IActorScheduler newThreadPerActorScheduler(ILogger logger, Consumer<Map<String, Integer>> metricConsumer) {
+        return new ThreadPerActorScheduler(logger, metricConsumer);
     }
 
 }

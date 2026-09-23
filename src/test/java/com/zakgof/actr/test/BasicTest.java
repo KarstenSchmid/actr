@@ -21,7 +21,7 @@ import com.zakgof.actr.Schedulers;
 
 class BasicTest {
 
-    private final IActorSystem system = Actr.newSystem("test", Schedulers.newThreadPerActorScheduler());
+    private final IActorSystem system = Actr.newSystem("test", Schedulers.newThreadPerActorScheduler(null, null));
 
     private final IActorRef<Master> master = system.<Master>actorBuilder()
             .constructor(Master::new)

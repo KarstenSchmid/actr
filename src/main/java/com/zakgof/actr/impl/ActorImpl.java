@@ -80,7 +80,7 @@ class ActorImpl<T> implements IActorRef<T> {
 
     @Override
     public String toString() {
-        return "[" + name + "]";
+        return name;
     }
 
     @Override

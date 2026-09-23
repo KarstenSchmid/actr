@@ -29,7 +29,7 @@ class ShutdownTest {
     // @Test
     void shutdownDedicated() throws InterruptedException {
         int initialThreads = Thread.activeCount();
-        IActorScheduler scheduler = Schedulers.newThreadPerActorScheduler();
+        IActorScheduler scheduler = Schedulers.newThreadPerActorScheduler(null, null);
         IActorRef<Yielder> d1 = system.<Yielder> actorBuilder().constructor(Yielder::new).scheduler(scheduler).build();
         IActorRef<Yielder> d2 = system.<Yielder> actorBuilder().constructor(Yielder::new).scheduler(scheduler).build();
         IActorRef<Yielder> d3 = system.<Yielder> actorBuilder().constructor(Yielder::new).scheduler(scheduler).build();
